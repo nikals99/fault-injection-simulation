@@ -1,5 +1,6 @@
 package de.nikals99.ghidrafaultinjector;
 
+import docking.ActionContext;
 import docking.action.MenuData;
 import ghidra.app.context.ListingActionContext;
 import ghidra.app.context.ListingContextAction;
@@ -39,42 +40,52 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
                 MENUNAME
         }, GROUPNAME);
 
-        ListingContextAction setFindAddressAction = new ListingContextAction("Set Find Address", getName()) {
+        findAddressActions();
+        glitchAddressActions();
 
+        blankStateActions();
+
+    }
+
+    private void blankStateActions() {
+        ListingContextAction setBlankStateAddress = new ListingContextAction("Set BlankState Address", getName()) {
             @Override
             protected void actionPerformed(ListingActionContext context) {
                 Address address = context.getLocation().getAddress();
-                if (currentFindAddress != null) {
-                    unSetColor(currentFindAddress);
+                if (currentBlankStateAddress != null) {
+                    unSetColor(currentBlankStateAddress);
                 }
-                currentFindAddress = address;
-                setColor(address, Color.GREEN);
-                plugin.provider.findOptionsPanel.setFindAddress("0x" + address.toString());
+                currentBlankStateAddress = address;
+                setColor(address, Color.BLUE);
+                plugin.provider.mainOptionsPanel.setBlankState("0x" + address.toString());
             }
         };
-
-        setFindAddressAction.setPopupMenuData(new MenuData(new String[]{
+        setBlankStateAddress.setPopupMenuData(new MenuData(new String[]{
                 MENUNAME,
                 "Set",
-                "Find Address"
-        }, null, GROUPNAME));
-        pluginTool.addAction(setFindAddressAction);
+                "BlankState Address"
+        }));
+        pluginTool.addAction(setBlankStateAddress);
 
-        ListingContextAction clearFindAddressAction = new ListingContextAction("Clear Find Address", getName()) {
+        ListingContextAction clearBlankStateAddress = new ListingContextAction("Clear BlankState Address", getName()) {
             @Override
-            protected void actionPerformed(ListingActionContext context) {
-                unSetColor(currentFindAddress);
-                currentFindAddress = null;
-                plugin.provider.findOptionsPanel.setFindAddress("");
+            public void actionPerformed(ActionContext context) {
+                if (currentBlankStateAddress != null) {
+                    unSetColor(currentBlankStateAddress);
+                }
+                currentBlankStateAddress = null;
+                plugin.provider.mainOptionsPanel.clearBlankState();
             }
         };
-        clearFindAddressAction.setPopupMenuData(new MenuData(new String[]{
+        clearBlankStateAddress.setPopupMenuData(new MenuData(new String[]{
                 MENUNAME,
                 "Clear",
-                "Find Address"
+                "BlankState Address"
         }));
-        pluginTool.addAction(clearFindAddressAction);
+        pluginTool.addAction(clearBlankStateAddress);
+    }
 
+    private void glitchAddressActions() {
         ListingContextAction setGlitchAddressAction = new ListingContextAction("Add Glitch Addresses", getName()) {
             @Override
             protected void actionPerformed(ListingActionContext context) {
@@ -112,26 +123,44 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
                 "Glitch Addresses"
         }));
         pluginTool.addAction(clearGlitchAddresses);
+    }
 
-        ListingContextAction setBlankStateAddress = new ListingContextAction("BlankState Address", getName()) {
+    private void findAddressActions() {
+        ListingContextAction setFindAddressAction = new ListingContextAction("Set Find Address", getName()) {
+
             @Override
             protected void actionPerformed(ListingActionContext context) {
                 Address address = context.getLocation().getAddress();
-                if (currentBlankStateAddress != null) {
-                    unSetColor(currentBlankStateAddress);
+                if (currentFindAddress != null) {
+                    unSetColor(currentFindAddress);
                 }
-                currentBlankStateAddress = address;
-                setColor(address, Color.BLUE);
-                plugin.provider.mainOptionsPanel.setBlankState("0x"+ address.toString());
+                currentFindAddress = address;
+                setColor(address, Color.GREEN);
+                plugin.provider.findOptionsPanel.setFindAddress("0x" + address.toString());
             }
         };
-        setBlankStateAddress.setPopupMenuData(new MenuData(new String[]{
+
+        setFindAddressAction.setPopupMenuData(new MenuData(new String[]{
                 MENUNAME,
                 "Set",
-                "BlankState Address"
-        }));
-        pluginTool.addAction(setBlankStateAddress);
+                "Find Address"
+        }, null, GROUPNAME));
+        pluginTool.addAction(setFindAddressAction);
 
+        ListingContextAction clearFindAddressAction = new ListingContextAction("Clear Find Address", getName()) {
+            @Override
+            protected void actionPerformed(ListingActionContext context) {
+                unSetColor(currentFindAddress);
+                currentFindAddress = null;
+                plugin.provider.findOptionsPanel.setFindAddress("");
+            }
+        };
+        clearFindAddressAction.setPopupMenuData(new MenuData(new String[]{
+                MENUNAME,
+                "Clear",
+                "Find Address"
+        }));
+        pluginTool.addAction(clearFindAddressAction);
     }
 
     public void setProgram(Program program) {

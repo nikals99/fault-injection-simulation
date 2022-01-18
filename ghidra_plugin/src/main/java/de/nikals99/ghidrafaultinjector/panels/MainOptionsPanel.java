@@ -123,4 +123,9 @@ public class MainOptionsPanel extends JPanel {
         blankStateCheckBox.setSelected(true);
         blankStateStartAtTextField.setText(address);
     }
+
+    public void clearBlankState() {
+        blankStateCheckBox.setSelected(false);
+        blankStateStartAtTextField.setText("");
+    }
 }
