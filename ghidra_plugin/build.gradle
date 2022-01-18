@@ -18,7 +18,7 @@ else {
 
 apply plugin: 'base'
 
-group 'de.niklasfassbender'
+group 'de.nikals99'
 version '1.0-SNAPSHOT'
 
 repositories {

@@ -52,13 +52,18 @@ class Analyzer():
         # TODO thumb modifications
 
         self.proj.hook(glitch_addr, hook_nop, length=glitch_len)
-        state = self.proj.factory.entry_state(add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
-                                                           angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
+
+        if self.options["mainOptions"]["useBlankState"]:
+            state = self.proj.factory.blank_state(addr=int(self.options["mainOptions"]["blankStateStartAt"], 16),
+                                                  add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
+                                                               angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
+        else:
+            state = self.proj.factory.entry_state(add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
+                                                               angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
 
         for mod in self.options["stateModificationOptions"]["memoryModifications"]:
             state.memory.store(int(mod["address"], 16), int(mod["value"], 16), mod["length"])
 
-        print(f"Memory: {state.memory.load(0x4e0f68)}")
         simgr = self.proj.factory.simgr(state)
         tl = TimeLimitedExecution(time_limit=TIME_LIMIT_MILLIS)
         simgr.use_technique(tl)
@@ -97,8 +102,15 @@ class Analyzer():
 
     def find_paths_to_glitch(self, instruction):
         glitch_addr = int(instruction["address"], 16)
-        state = self.proj.factory.entry_state(add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
+
+        if self.options["mainOptions"]["useBlankState"]:
+            state = self.proj.factory.blank_state(addr=int(self.options["mainOptions"]["blankStateStartAt"], 16),
+                                                  add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
+                                                               angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
+        else:
+            state = self.proj.factory.entry_state(add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
                                                            angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
+
         for mod in self.options["stateModificationOptions"]["memoryModifications"]:
             state.memory.store(int(mod["address"], 16), int(mod["value"], 16), int(mod["length"]))
 

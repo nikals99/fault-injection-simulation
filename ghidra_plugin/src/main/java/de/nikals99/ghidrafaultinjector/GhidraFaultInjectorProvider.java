@@ -2,7 +2,6 @@ package de.nikals99.ghidrafaultinjector;
 
 import de.nikals99.ghidrafaultinjector.panels.*;
 import de.nikals99.ghidrafaultinjector.model.SearchForGlitchRequest;
-import de.niklasfassbender.ghidrafaultinjector.panels.*;
 import de.nikals99.ghidrafaultinjector.tasks.FindGlitchTask;
 import docking.ComponentProvider;
 import ghidra.app.plugin.core.colorizer.ColorizingService;

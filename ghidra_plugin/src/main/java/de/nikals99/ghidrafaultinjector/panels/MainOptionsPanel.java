@@ -24,7 +24,7 @@ public class MainOptionsPanel extends JPanel {
     private JTextField entryPointTextField;
     private JTextField archTextField;
     private JCheckBox blankStateCheckBox;
-    private AddressInput blankStateStartAtTextField;
+    private JTextField blankStateStartAtTextField;
 
     private Program program;
 
@@ -63,7 +63,7 @@ public class MainOptionsPanel extends JPanel {
         this.add(new GLabel("Entrypoint:", SwingConstants.RIGHT));
         this.add(entryPointTextField);
 
-        blankStateStartAtTextField = new AddressInput();
+        blankStateStartAtTextField = new JTextField();
         blankStateStartAtTextField.setVisible(false);
         GLabel blankStateStartAtLabel = new GLabel("Blankstate Start At:", SwingConstants.RIGHT);
         blankStateStartAtLabel.setVisible(false);
@@ -87,7 +87,7 @@ public class MainOptionsPanel extends JPanel {
                 entryPointTextField.getText(),
                 baseAddrTextField.getText(),
                 blankStateCheckBox.isSelected(),
-                blankStateStartAtTextField.getValue()
+                blankStateStartAtTextField.getText()
         );
         return mainOptions;
     }
@@ -117,5 +117,10 @@ public class MainOptionsPanel extends JPanel {
             baseAddrTextField.setText("0x" + program.getImageBase().toString());
             entryPointTextField.setText("0x" + program.getImageBase().toString());
         }
+    }
+
+    public void setBlankState(String address) {
+        blankStateCheckBox.setSelected(true);
+        blankStateStartAtTextField.setText(address);
     }
 }

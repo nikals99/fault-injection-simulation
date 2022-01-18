@@ -21,8 +21,8 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
     private PluginTool pluginTool;
     private GhidraFaultInjectorPlugin plugin;
 
-
     private Address currentFindAddress;
+    private Address currentBlankStateAddress;
     private List<Address> glitchAddresses;
 
     public GhidraFaultInjectorListingContextAction(GhidraFaultInjectorPlugin plugin, Program program) {
@@ -112,6 +112,26 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
                 "Glitch Addresses"
         }));
         pluginTool.addAction(clearGlitchAddresses);
+
+        ListingContextAction setBlankStateAddress = new ListingContextAction("BlankState Address", getName()) {
+            @Override
+            protected void actionPerformed(ListingActionContext context) {
+                Address address = context.getLocation().getAddress();
+                if (currentBlankStateAddress != null) {
+                    unSetColor(currentBlankStateAddress);
+                }
+                currentBlankStateAddress = address;
+                setColor(address, Color.BLUE);
+                plugin.provider.mainOptionsPanel.setBlankState("0x"+ address.toString());
+            }
+        };
+        setBlankStateAddress.setPopupMenuData(new MenuData(new String[]{
+                MENUNAME,
+                "Set",
+                "BlankState Address"
+        }));
+        pluginTool.addAction(setBlankStateAddress);
+
     }
 
     public void setProgram(Program program) {
