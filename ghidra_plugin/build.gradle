@@ -1,0 +1,53 @@
+//----------------------START "DO NOT MODIFY" SECTION------------------------------
+def ghidraInstallDir
+
+if (System.env.GHIDRA_INSTALL_DIR) {
+    ghidraInstallDir = System.env.GHIDRA_INSTALL_DIR
+}
+else if (project.hasProperty("GHIDRA_INSTALL_DIR")) {
+    ghidraInstallDir = project.getProperty("GHIDRA_INSTALL_DIR")
+}
+
+if (ghidraInstallDir) {
+    apply from: new File(ghidraInstallDir).getCanonicalPath() + "/support/buildExtension.gradle"
+}
+else {
+    throw new GradleException("GHIDRA_INSTALL_DIR is not defined!")
+}
+//----------------------END "DO NOT MODIFY" SECTION-------------------------------
+
+apply plugin: 'base'
+
+group 'de.niklasfassbender'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    toCopy
+}
+
+dependencies {
+    implementation configurations.toCopy
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.0'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.13.0'
+}
+
+task copyToLib(type: Copy) {
+    from configurations.toCopy
+    into 'lib'
+}
+
+buildExtension {
+    from ("../py_scripts") {
+        into "/ghidra-faultinjector/py_scripts"
+        exclude "__pycache__"
+    }
+    from({ new File(temporaryDir, 'tmp').mkdirs(); temporaryDir }) {
+        into "/ghidra-faultinjector/tmp"
+    }
+}
+
+processResources.dependsOn copyToLib
