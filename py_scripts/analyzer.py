@@ -5,11 +5,14 @@ from angr import SimState, Project
 from angr.sim_state import SimStateHistory
 from timeout import TimeLimitedExecution
 
+
 def hook_nop(state: SimState):
     pass
 
+
 MAX_PATHS_COUNT = 100
 TIME_LIMIT_MILLIS = 3000
+
 
 class Analyzer():
     def __init__(self, options):
@@ -25,6 +28,7 @@ class Analyzer():
         print(f"Running angr with main_opts={main_opts}")
         self.proj = angr.Project(self.options["mainOptions"]["pathToBinary"], main_opts=main_opts)
         self.project_info()
+        self.avoid_addrs = [int(x, 16) for x in self.options["findOptions"]["avoidAddresses"]]
 
     def glitch(self):
         working_glitches = []
@@ -67,7 +71,7 @@ class Analyzer():
         simgr = self.proj.factory.simgr(state)
         tl = TimeLimitedExecution(time_limit=TIME_LIMIT_MILLIS)
         simgr.use_technique(tl)
-        simgr.explore(find=self.options["find"], num_find=MAX_PATHS_COUNT)
+        simgr.explore(find=self.options["find"], avoid=self.avoid_addrs, num_find=MAX_PATHS_COUNT)
 
         self.proj.unhook(glitch_addr)
 
@@ -109,7 +113,7 @@ class Analyzer():
                                                                angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
         else:
             state = self.proj.factory.entry_state(add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
-                                                           angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
+                                                               angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
 
         for mod in self.options["stateModificationOptions"]["memoryModifications"]:
             state.memory.store(int(mod["address"], 16), int(mod["value"], 16), int(mod["length"]))
@@ -117,7 +121,7 @@ class Analyzer():
         simgr = self.proj.factory.simgr(state)
         tl = TimeLimitedExecution(time_limit=TIME_LIMIT_MILLIS)
         simgr.use_technique(tl)
-        simgr.explore(find=glitch_addr, num_find=MAX_PATHS_COUNT)
+        simgr.explore(find=glitch_addr, avoid=self.avoid_addrs, num_find=MAX_PATHS_COUNT)
 
         return self.extract_paths(simgr.found)
 

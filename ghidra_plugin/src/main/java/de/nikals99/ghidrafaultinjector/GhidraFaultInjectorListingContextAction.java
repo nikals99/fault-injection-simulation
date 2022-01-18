@@ -25,13 +25,15 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
     private Address currentFindAddress;
     private Address currentBlankStateAddress;
     private List<Address> glitchAddresses;
+    private List<Address> avoidAddresses;
 
     public GhidraFaultInjectorListingContextAction(GhidraFaultInjectorPlugin plugin, Program program) {
         super("GhidraFaultInjectorPlugin", plugin.getName());
         this.program = program;
         this.pluginTool = plugin.getTool();
         this.plugin = plugin;
-        glitchAddresses = new ArrayList<>();
+        this.glitchAddresses = new ArrayList<>();
+        this.avoidAddresses = new ArrayList<>();
         setupActions();
     }
 
@@ -42,9 +44,8 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
 
         findAddressActions();
         glitchAddressActions();
-
         blankStateActions();
-
+        avoidAddressActions();
     }
 
     private void blankStateActions() {
@@ -162,6 +163,47 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
         }));
         pluginTool.addAction(clearFindAddressAction);
     }
+
+    private void avoidAddressActions() {
+        ListingContextAction addAvoidAddressAction = new ListingContextAction("Add Avoid Addresses", getName()) {
+            @Override
+            protected void actionPerformed(ListingActionContext context) {
+                AddressSet addressSet = new AddressSet();
+                addressSet.add(context.getSelection().getMinAddress(), context.getSelection().getMaxAddress());
+                program.getListing().getInstructions(addressSet, true).forEach((instruction) -> {
+                            avoidAddresses.add(instruction.getAddress());
+                            setColor(instruction.getAddress(), Color.pink);
+                        }
+                );
+                List<String> addressStrings = avoidAddresses.stream().map((address -> "0x" + address.toString())).collect(Collectors.toList());
+                plugin.provider.findOptionsPanel.getAvoidAddrsTextArea().setText(String.join("\n", addressStrings));
+            }
+        };
+        addAvoidAddressAction.setPopupMenuData(new MenuData(new String[]{
+                MENUNAME,
+                "Add",
+                "Avoid Addresses"
+        }));
+        pluginTool.addAction(addAvoidAddressAction);
+
+        ListingContextAction clearAvoidAddresses = new ListingContextAction("Clear Avoid Addresses", getName()) {
+            @Override
+            protected void actionPerformed(ListingActionContext context) {
+                avoidAddresses.forEach(avoidAddress -> {
+                    unSetColor(avoidAddress);
+                });
+                avoidAddresses.clear();
+                plugin.provider.findOptionsPanel.getAvoidAddrsTextArea().setText("");
+            }
+        };
+        clearAvoidAddresses.setPopupMenuData(new MenuData(new String[]{
+                MENUNAME,
+                "Clear",
+                "Avoid Addresses"
+        }));
+        pluginTool.addAction(clearAvoidAddresses);
+    }
+
 
     public void setProgram(Program program) {
         this.program = program;

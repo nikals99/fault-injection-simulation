@@ -71,4 +71,8 @@ public class FindOptionsPanel extends JPanel {
     public void setFindAddress(String address) {
         this.findAddressTextField.setText(address);
     }
+
+    public ScrollableTextArea getAvoidAddrsTextArea() {
+        return avoidAddrsTextArea;
+    }
 }
