@@ -1,0 +1,11 @@
+.idea
+/venv
+
+__pycache__/
+
+/ghidra_plugin/dist
+/ghidra_plugin/lib
+/ghidra_plugin/gradle.properties
+/ghidra_plugin/build
+/ghidra_plugin/.gradle
+
