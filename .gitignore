@@ -9,3 +9,5 @@ __pycache__/
 /ghidra_plugin/build
 /ghidra_plugin/.gradle
 
+
+notebooks/.ipynb_checkpoints

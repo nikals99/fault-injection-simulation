@@ -4,10 +4,8 @@ import angr
 from angr import SimState, Project
 from angr.sim_state import SimStateHistory
 from timeout import TimeLimitedExecution
+import common
 
-
-def hook_nop(state: SimState):
-    pass
 
 
 MAX_PATHS_COUNT = 100
@@ -27,7 +25,7 @@ class Analyzer():
             }
         print(f"Running angr with main_opts={main_opts}")
         self.proj = angr.Project(self.options["mainOptions"]["pathToBinary"], main_opts=main_opts)
-        self.project_info()
+        common.project_info(self.proj)
         self.avoid_addrs = [int(x, 16) for x in self.options["findOptions"]["avoidAddresses"]]
 
     def glitch(self):
@@ -55,7 +53,7 @@ class Analyzer():
         glitch_addr = int(instruction["address"], 16)
         # TODO thumb modifications
 
-        self.proj.hook(glitch_addr, hook_nop, length=glitch_len)
+        self.proj.hook(glitch_addr, common.hook_nop, length=glitch_len)
 
         if self.options["mainOptions"]["useBlankState"]:
             state = self.proj.factory.blank_state(addr=int(self.options["mainOptions"]["blankStateStartAt"], 16),
@@ -94,15 +92,6 @@ class Analyzer():
             parent = parent.parent
 
         return total_instructions
-
-    def project_info(self):
-        print("############ project info ############")
-        print(f"file: {self.proj.filename}")
-        print(f"arch: {self.proj.arch}")
-        print(f"entry: {hex(self.proj.entry)}")
-        print(f"min_addr: {hex(self.proj.loader.min_addr)}")
-        print(f"max_addr: {hex(self.proj.loader.max_addr)}")
-        print("############ project info ############")
 
     def find_paths_to_glitch(self, instruction):
         glitch_addr = int(instruction["address"], 16)
