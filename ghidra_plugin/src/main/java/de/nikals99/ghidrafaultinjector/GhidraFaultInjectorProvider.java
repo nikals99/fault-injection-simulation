@@ -11,8 +11,6 @@ import ghidra.util.layout.VariableHeightPairLayout;
 import ghidra.util.task.TaskLauncher;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
 
 public class GhidraFaultInjectorProvider extends ComponentProvider {
     private JPanel panel;
@@ -56,7 +54,8 @@ public class GhidraFaultInjectorProvider extends ComponentProvider {
         stateModificationOptionsPanel = new StateModificationOptionsPanel();
         searchForGlitchPanel.add(stateModificationOptionsPanel);
 
-        searchForGlitchPanel.add(buildFindGlitchSection());
+        glitchOptionsPanel = new GlitchOptionsPanel(this);
+        searchForGlitchPanel.add(glitchOptionsPanel);
         tabPane.addTab("SearchForGlitch", searchForGlitchPanel);
 
         searchForGlitchResponsePanel = new SearchForGlitchResponsePanel(this.program, this.colorizingService);
@@ -64,38 +63,16 @@ public class GhidraFaultInjectorProvider extends ComponentProvider {
         setVisible(true);
     }
 
-    private Component buildFindGlitchSection() {
-        JPanel findGlichtPanel = new JPanel();
-        findGlichtPanel.setForeground(new Color(46, 139, 87));
-        TitledBorder borderMPO = BorderFactory.createTitledBorder("Find Glitch");
-        borderMPO.setTitleFont(new Font("SansSerif", Font.PLAIN, 12));
-        findGlichtPanel.setBorder(borderMPO);
-        findGlichtPanel.setLayout(new BorderLayout());
+    public void sendRequestToPython() {
+        SearchForGlitchRequest req = new SearchForGlitchRequest(
+                mainOptionsPanel.getMainOptions(),
+                findOptionsPanel.getFindOptions(),
+                stateModificationOptionsPanel.getStateModificationOptions(),
+                glitchOptionsPanel.getGlitchOptions()
+        );
 
-        glitchOptionsPanel = new GlitchOptionsPanel();
-        findGlichtPanel.add(glitchOptionsPanel, BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel();
-        JButton runButton = new JButton("RUN");
-        runButton.addActionListener(actionListener -> {
-            SearchForGlitchRequest req = new SearchForGlitchRequest(
-                    mainOptionsPanel.getMainOptions(),
-                    findOptionsPanel.getFindOptions(),
-                    stateModificationOptionsPanel.getStateModificationOptions(),
-                    glitchOptionsPanel.getGlitchOptions()
-            );
-
-            TaskLauncher.launch(new FindGlitchTask(plugin, req, searchForGlitchResponsePanel));
-        });
-        buttonPanel.add(runButton);
-
-        findGlichtPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        return findGlichtPanel;
+        TaskLauncher.launch(new FindGlitchTask(plugin, req, searchForGlitchResponsePanel));
     }
-
-
-    //TODO early return (when first path is found)
 
     @Override
     public JComponent getComponent() {
