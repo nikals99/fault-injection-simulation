@@ -1,2 +1,8 @@
 01_simple: src/01_simple.c
 	 aarch64-linux-gnu-gcc-9 -o out/01_simple src/01_simple.c
+
+02_mulitglitch: src/02_multiglitch.c
+	aarch64-linux-gnu-gcc-9 -o out/02_multiglitch src/02_multiglitch.c
+
+
+all: 01_simple 02_mulitglitch
