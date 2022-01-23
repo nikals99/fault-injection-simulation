@@ -1,8 +1,7 @@
 from typing import List
 
 import angr
-from angr import SimState, Project
-from angr.sim_state import SimStateHistory
+from angr import SimState
 from timeout import TimeLimitedExecution
 import common
 
@@ -51,7 +50,6 @@ class Analyzer():
         glitch_len = 4
         print(instruction)
         glitch_addr = int(instruction["address"], 16)
-        # TODO thumb modifications
 
         self.proj.hook(glitch_addr, common.hook_nop, length=glitch_len)
 
@@ -75,23 +73,6 @@ class Analyzer():
 
         return simgr.found
 
-    def backtrace(self, proj: Project, history: SimStateHistory):
-        total_instructions = 0
-        parent = history
-
-        while parent.addr is not None:
-            print("###################")
-            print(f"addr: {hex(parent.addr)}")
-            print(f"jumpkind: {parent.jumpkind}")
-            print(f"jumpguard: {parent.jump_guard}")
-            block = proj.factory.block(addr=parent.addr)
-            print(f"#instructions: {block.instructions}")
-            total_instructions += block.instructions
-            print(f"Code:")
-            block.pp()
-            parent = parent.parent
-
-        return total_instructions
 
     def find_paths_to_glitch(self, instruction):
         glitch_addr = int(instruction["address"], 16)
@@ -112,26 +93,4 @@ class Analyzer():
         simgr.use_technique(tl)
         simgr.explore(find=glitch_addr, avoid=self.avoid_addrs, num_find=MAX_PATHS_COUNT)
 
-        return self.extract_paths(simgr.found)
-
-    def extract_paths(self, sim_states):
-        paths = []
-        for state in sim_states:
-            history: SimStateHistory = state.history
-            parent = history
-            blocks = []
-            instruction_count = 0
-            while parent.addr is not None:
-                block = self.proj.factory.block(addr=parent.addr)
-                instruction_addrs = [hex(addr) for addr in block.instruction_addrs]
-                instruction_count += block.instructions
-                block = {"address": hex(parent.addr), "instructionAddrs": instruction_addrs}
-                blocks.append(block)
-                parent = parent.parent
-            path = {"blocks": blocks, "instructionCount": instruction_count}
-            paths.append(path)
-
-        return paths
-
-    def write_results(self, working_glitches):
-        print(working_glitches)
+        return common.extract_paths(self.proj, simgr.found)
