@@ -46,6 +46,7 @@ public class FindGlitchTask extends Task {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("Running " + " python3 " + " -u " + this.pythonScriptPath + this.tmpPath);
         runCommand("python3", "-u", this.pythonScriptPath, this.tmpPath);
 
         ArrayList<SearchForGlitchResponse> resp = new ArrayList<>();

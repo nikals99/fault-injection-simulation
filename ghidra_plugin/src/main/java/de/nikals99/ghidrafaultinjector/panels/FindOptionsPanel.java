@@ -59,9 +59,14 @@ public class FindOptionsPanel extends JPanel {
     }
 
     public FindOptions getFindOptions() {
+        String[] avoidAddrs = avoidAddrsTextArea.getText().split("\n");
+        //prevent empty input
+        if (avoidAddrs[0].equals("")) {
+            avoidAddrs = new String[0];
+        }
         FindOptions findOptions = new FindOptions(
                 findAddressTextField.getText(),
-                avoidAddrsTextArea.getText().split("\n"),
+                avoidAddrs,
                 useCustomFindFunctionCheckBox.isSelected(),
                 customFindFunction.getText()
         );
