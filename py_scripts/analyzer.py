@@ -30,7 +30,7 @@ class Analyzer():
     def glitch(self):
         working_glitches = []
         print("starting to find path without glitch")
-        found: List[SimState] = self.find_path_with_glitch({"address": "0xFFFFFFFF", "thumb": False})
+        found: List[SimState] = self.find_path_with_glitch({"address": "0xFFFFFFFF"})
         if len(found) > 0:
             print(f"found {len(found)} path(s) without glitching")
             working_glitches.append({"glitchAddress": "0x0", "paths": common.extract_paths(self.proj, found)})

@@ -9,3 +9,4 @@ RUN apt-get install -y build-essential
 
 RUN apt-get install -y gcc-9-aarch64-linux-gnu
 
+WORKDIR /work

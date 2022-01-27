@@ -44,7 +44,7 @@ public class GlitchOptionsPanel extends JPanel {
         ArrayList<Instruction> instructions = new ArrayList<>();
 
         for (String instructionAddr : instructionAddrs) {
-            instructions.add(new Instruction(instructionAddr, false));
+            instructions.add(new Instruction(instructionAddr));
         }
 
         GlitchOptions glitchOptions = new GlitchOptions(instructions);
