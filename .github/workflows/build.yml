@@ -33,7 +33,8 @@ jobs:
       run: |
         echo "building for version ${{matrix.version}}"
         wget ${{matrix.DOWNLOAD_URL}}
-        mkdir -p /ghidra
-        unzip ${{matrix.PACKAGE_NAME}} -d /ghidra
-        export GHIDRA_INSTALL_DIR=/ghidra/${{matrix.DIRECTORY_NAME}}
+        mkdir -p ./ghidra
+        unzip ${{matrix.PACKAGE_NAME}} -d ghidra
+        export CURRENT_DIR=$(pwd)
+        export GHIDRA_INSTALL_DIR=${CURRENT_DIR}/ghidra/${{matrix.DIRECTORY_NAME}}
         cd ghidra_plugin && ./gradlew
