@@ -43,6 +43,6 @@ jobs:
     - name: Store artifcact
       uses: actions/upload-artifact@v2
       with:
-        name: ${{DIRECTORY_NAME}}-ghidra-faultinjector.zip
+        name: ${{matrix.DIRECTORY_NAME}}-ghidra-faultinjector.zip
         path: |
           ghidra_plugin/dist/*.zip
