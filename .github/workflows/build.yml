@@ -20,7 +20,7 @@ jobs:
         - version: "10.1.2"
           DOWNLOAD_URL: "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_10.1.2_build/ghidra_10.1.2_PUBLIC_20220125.zip"
           PACKAGE_NAME: "ghidra_10.1.2_PUBLIC_20220125.zip"
-          DIRECTORY_NAME: "ghidra_10.1.2_PUBLIC_20220125"
+          DIRECTORY_NAME: "ghidra_10.1.2_PUBLIC"
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -32,9 +32,9 @@ jobs:
     - name: install ghidra
       run: |
         echo "building for version ${{matrix.version}}"
-        wget ${{matrix.DOWNLOAD_URL}}
+        wget -q ${{matrix.DOWNLOAD_URL}}
         mkdir -p ./ghidra
-        unzip ${{matrix.PACKAGE_NAME}} -d ghidra
+        unzip -q ${{matrix.PACKAGE_NAME}} -d ghidra
         export CURRENT_DIR=$(pwd)
         export GHIDRA_INSTALL_DIR=${CURRENT_DIR}/ghidra/${{matrix.DIRECTORY_NAME}}
         cd ghidra_plugin && ./gradlew
