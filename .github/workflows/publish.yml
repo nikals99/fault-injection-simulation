@@ -55,6 +55,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           path: assets
+      - run: ls -lah ./assets
       - name: Upload release assets
         uses: skx/github-action-publish-binaries@master
         env:
