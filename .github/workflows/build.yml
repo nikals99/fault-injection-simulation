@@ -35,6 +35,14 @@ jobs:
         wget -q ${{matrix.DOWNLOAD_URL}}
         mkdir -p ./ghidra
         unzip -q ${{matrix.PACKAGE_NAME}} -d ghidra
+    - name: build plugin
+      run: |
         export CURRENT_DIR=$(pwd)
         export GHIDRA_INSTALL_DIR=${CURRENT_DIR}/ghidra/${{matrix.DIRECTORY_NAME}}
         cd ghidra_plugin && ./gradlew
+    - name: Store artifcact
+      uses: actions/upload-artifact@v2
+      with:
+        name: package
+        path: |
+          ghidra_plugin/dist/*.zip
