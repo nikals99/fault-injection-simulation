@@ -35,5 +35,5 @@ jobs:
         wget ${{matrix.DOWNLOAD_URL}}
         mkdir -p /ghidra
         unzip ${{matrix.PACKAGE_NAME}} -d /ghidra
-        export GHIDRA_INSTALL_DIR=/ghidra/${{DIRECTORY_NAME}}
+        export GHIDRA_INSTALL_DIR=/ghidra/${{matrix.DIRECTORY_NAME}}
         cd ghidra_plugin && ./gradlew
