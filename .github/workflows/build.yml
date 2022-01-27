@@ -16,24 +16,24 @@ jobs:
       fail-fast: false
       matrix:
         version: ["10.1.2"]
-        includes:
-          - version: "10.1.2"
-            DOWNLOAD_URL: "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_10.1.2_build/ghidra_10.1.2_PUBLIC_20220125.zip"
-            PACKAGE_NAME: "ghidra_10.1.2_PUBLIC_20220125.zip"
-            DIRECTORY_NAME: "ghidra_10.1.2_PUBLIC_20220125"
+        include:
+        - version: "10.1.2"
+          DOWNLOAD_URL: "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_10.1.2_build/ghidra_10.1.2_PUBLIC_20220125.zip"
+          PACKAGE_NAME: "ghidra_10.1.2_PUBLIC_20220125.zip"
+          DIRECTORY_NAME: "ghidra_10.1.2_PUBLIC_20220125"
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: setup-java
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'temurin'
-          java-version: '11'
-      - name: install ghidra
-        run: |
-          echo "building for version ${{matrix.version}}"
-          wget ${{matrix.DOWNLOAD_URL}}
-          mkdir -p /ghidra
-          unzip ${{matrix.PACKAGE_NAME}} -d /ghidra
-          export GHIDRA_INSTALL_DIR=/ghidra/${{DIRECTORY_NAME}}
-          cd ghidra_plugin && ./gradlew
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: setup-java
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+    - name: install ghidra
+      run: |
+        echo "building for version ${{matrix.version}}"
+        wget ${{matrix.DOWNLOAD_URL}}
+        mkdir -p /ghidra
+        unzip ${{matrix.PACKAGE_NAME}} -d /ghidra
+        export GHIDRA_INSTALL_DIR=/ghidra/${{DIRECTORY_NAME}}
+        cd ghidra_plugin && ./gradlew
