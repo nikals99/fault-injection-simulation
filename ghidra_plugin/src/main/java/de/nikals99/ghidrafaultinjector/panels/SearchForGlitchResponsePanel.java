@@ -82,7 +82,12 @@ public class SearchForGlitchResponsePanel extends JPanel {
             colorizingService.clearBackgroundColor(program.getMinAddress(), program.getMaxAddress());
             selectedPath.getBlocks().forEach(block -> {
                 Address firstAddress = api.toAddr(block.getAddress());
-                Address lastAddress = api.toAddr(block.getInstructionAddrs().get(block.getInstructionAddrs().size()-1));
+                Address lastAddress;
+                if (block.getInstructionAddrs().size() > 1) {
+                    lastAddress = api.toAddr(block.getInstructionAddrs().get(block.getInstructionAddrs().size()-1));
+                } else {
+                    lastAddress = firstAddress;
+                }
 
                 colorizingService.setBackgroundColor(firstAddress, lastAddress, Color.pink);
             });
