@@ -4,7 +4,6 @@ import de.nikals99.ghidrafaultinjector.model.MainOptions;
 import docking.widgets.checkbox.GCheckBox;
 import docking.widgets.combobox.GComboBox;
 import docking.widgets.label.GLabel;
-import ghidra.app.util.AddressInput;
 import ghidra.app.util.opinion.BinaryLoader;
 import ghidra.app.util.opinion.ElfLoader;
 import ghidra.app.util.opinion.MachoLoader;

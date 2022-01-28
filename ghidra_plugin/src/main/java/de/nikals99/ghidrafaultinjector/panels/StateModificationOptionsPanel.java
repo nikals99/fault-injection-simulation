@@ -2,6 +2,7 @@ package de.nikals99.ghidrafaultinjector.panels;
 
 import de.nikals99.ghidrafaultinjector.model.MemoryModification;
 import de.nikals99.ghidrafaultinjector.model.StateModificationOptions;
+import docking.widgets.combobox.GComboBox;
 import docking.widgets.label.GLabel;
 import docking.widgets.list.ListPanel;
 import docking.widgets.textfield.HexOrDecimalInput;
@@ -51,6 +52,10 @@ public class StateModificationOptionsPanel extends JPanel {
         inputRow.add(new GLabel("Length:", SwingConstants.RIGHT));
         inputRow.add(lengthInputTextField);
 
+        GComboBox<String> byteOrderInputBox = new GComboBox<>(new String[]{"BE", "LE"});
+        inputRow.add(new GLabel("Byte order:", SwingConstants.RIGHT));
+        inputRow.add(byteOrderInputBox);
+
         JButton deleteButton = new JButton("Delete Selected");
         deleteButton.addActionListener(actionListener -> {
             int selectedIndex = listPanel.getSelectedIndex();
@@ -66,7 +71,7 @@ public class StateModificationOptionsPanel extends JPanel {
             String value = valueInputTextField.getText();
             int length = lengthInputTextField.getIntValue();
 
-            memoryModificationDefaultListModel.addElement(new MemoryModification(address, value, length));
+            memoryModificationDefaultListModel.addElement(new MemoryModification(address, value, length, (String)byteOrderInputBox.getSelectedItem()));
 
             addressInputTextField.setText("");
             valueInputTextField.setText("");

@@ -1,6 +1,7 @@
 from typing import List
 
 import angr
+import archinfo
 from angr import SimState
 from timeout import TimeLimitedExecution
 import common
@@ -26,6 +27,24 @@ class Analyzer():
         self.proj = angr.Project(self.options["mainOptions"]["pathToBinary"], main_opts=main_opts)
         common.project_info(self.proj)
         self.avoid_addrs = [int(x, 16) for x in self.options["findOptions"]["avoidAddresses"]]
+
+    def get_state(self):
+        if self.options["mainOptions"]["useBlankState"]:
+            state = self.proj.factory.blank_state(addr=int(self.options["mainOptions"]["blankStateStartAt"], 16),
+                                                  add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
+                                                               angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
+        else:
+            state = self.proj.factory.entry_state(add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
+                                                           angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
+
+        for mod in self.options["stateModificationOptions"]["memoryModifications"]:
+            if mod["byteOrdering"] == "BE":
+                endness = archinfo.Endness.BE
+            else:
+                endness = archinfo.Endness.LE
+
+            state.memory.store(int(mod["address"], 16), int(mod["value"], 16), mod["length"], endness=endness)
+        return state
 
     def glitch(self):
         working_glitches = []
@@ -53,16 +72,7 @@ class Analyzer():
 
         self.proj.hook(glitch_addr, common.hook_nop, length=glitch_len)
 
-        if self.options["mainOptions"]["useBlankState"]:
-            state = self.proj.factory.blank_state(addr=int(self.options["mainOptions"]["blankStateStartAt"], 16),
-                                                  add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
-                                                               angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
-        else:
-            state = self.proj.factory.entry_state(add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
-                                                               angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
-
-        for mod in self.options["stateModificationOptions"]["memoryModifications"]:
-            state.memory.store(int(mod["address"], 16), int(mod["value"], 16), mod["length"])
+        state = self.get_state()
 
         simgr = self.proj.factory.simgr(state)
         tl = TimeLimitedExecution(time_limit=TIME_LIMIT_MILLIS)
@@ -76,16 +86,7 @@ class Analyzer():
     def find_paths_to_glitch(self, instruction):
         glitch_addr = int(instruction["address"], 16)
 
-        if self.options["mainOptions"]["useBlankState"]:
-            state = self.proj.factory.blank_state(addr=int(self.options["mainOptions"]["blankStateStartAt"], 16),
-                                                  add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
-                                                               angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
-        else:
-            state = self.proj.factory.entry_state(add_options={angr.options.SYMBOL_FILL_UNCONSTRAINED_MEMORY,
-                                                               angr.options.SYMBOL_FILL_UNCONSTRAINED_REGISTERS})
-
-        for mod in self.options["stateModificationOptions"]["memoryModifications"]:
-            state.memory.store(int(mod["address"], 16), int(mod["value"], 16), int(mod["length"]))
+        state = self.get_state()
 
         simgr = self.proj.factory.simgr(state)
         tl = TimeLimitedExecution(time_limit=TIME_LIMIT_MILLIS)
