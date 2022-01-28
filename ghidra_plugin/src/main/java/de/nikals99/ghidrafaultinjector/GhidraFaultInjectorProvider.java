@@ -28,49 +28,60 @@ public class GhidraFaultInjectorProvider extends ComponentProvider {
         super(plugin.getTool(), owner, owner);
         this.program = program;
         this.plugin = plugin;
-        ColorizingService colorizingService = plugin.getTool().getService(ColorizingService.class);
-        if (colorizingService == null) {
-            System.out.println("Can't find ColorizingService service");
-        }
-        this.colorizingService = colorizingService;
-        buildPanel();
-        System.out.println(plugin.getName());
 
+        // build the main plugin panel
+        buildPanel();
     }
 
     public void buildPanel() {
+        // create the main panel
         panel = new JPanel();
+        // add a tabbed pane to the main panel
         JTabbedPane tabPane = new JTabbedPane();
         panel.add(tabPane);
 
+        // set up the first tab of the tab pane
         JPanel searchForGlitchPanel = new JPanel();
+        // use a layout with two columns
         searchForGlitchPanel.setLayout(new VariableHeightPairLayout());
+
+        // create the main options panel and add it to the tab
         mainOptionsPanel = new MainOptionsPanel(this.program);
         searchForGlitchPanel.add(mainOptionsPanel);
 
+        // create the find options panel and add it to the tab
         findOptionsPanel = new FindOptionsPanel();
         searchForGlitchPanel.add(findOptionsPanel);
 
+        // create the state modification panel and add it to the tab
         stateModificationOptionsPanel = new StateModificationOptionsPanel();
         searchForGlitchPanel.add(stateModificationOptionsPanel);
 
+        // create the glitch options panel and add it to the tab
         glitchOptionsPanel = new GlitchOptionsPanel(this);
         searchForGlitchPanel.add(glitchOptionsPanel);
+
+        // add the first tab to the tab pane
         tabPane.addTab("SearchForGlitch", searchForGlitchPanel);
 
+        // create the second tab and add it to the tab pane
         searchForGlitchResponsePanel = new SearchForGlitchResponsePanel(this.program, this.colorizingService);
         tabPane.addTab("Response", searchForGlitchResponsePanel);
+
+        // make the window visible
         setVisible(true);
     }
 
+    // this function is used by the glitchoptions panel to collect input from the other panels and send them to python
     public void sendRequestToPython() {
+        // collect the information
         SearchForGlitchRequest req = new SearchForGlitchRequest(
                 mainOptionsPanel.getMainOptions(),
                 findOptionsPanel.getFindOptions(),
                 stateModificationOptionsPanel.getStateModificationOptions(),
                 glitchOptionsPanel.getGlitchOptions()
         );
-
+        // launch a Task that executes angr
         TaskLauncher.launch(new FindGlitchTask(plugin, req, searchForGlitchResponsePanel));
     }
 
@@ -80,14 +91,17 @@ public class GhidraFaultInjectorProvider extends ComponentProvider {
     }
 
     public void setProgram(Program program) {
+        // if the loaded program / binary changes: update all references to it
         this.program = program;
+        this.searchForGlitchResponsePanel.setProgram(program);
+        this.mainOptionsPanel.setProgram(program);
+
+        // create a new instance of colorizingService and update all references to it
         ColorizingService colorizingService = plugin.getTool().getService(ColorizingService.class);
         if (colorizingService == null) {
-            System.out.println("Can't find ColorizingService service");
+            System.out.println("Can't find ColorizingService");
         }
         this.colorizingService = colorizingService;
-        this.searchForGlitchResponsePanel.setProgram(program);
         this.searchForGlitchResponsePanel.setColorizingService(colorizingService);
-        this.mainOptionsPanel.setProgram(program);
     }
 }

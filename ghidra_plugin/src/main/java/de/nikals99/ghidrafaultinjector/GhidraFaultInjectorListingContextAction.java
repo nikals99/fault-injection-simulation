@@ -29,26 +29,35 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
 
     public GhidraFaultInjectorListingContextAction(GhidraFaultInjectorPlugin plugin, Program program) {
         super("GhidraFaultInjectorPlugin", plugin.getName());
+        // initialize variables
         this.program = program;
         this.pluginTool = plugin.getTool();
         this.plugin = plugin;
         this.glitchAddresses = new ArrayList<>();
         this.avoidAddresses = new ArrayList<>();
+
+        // setup the context Actions
         setupActions();
     }
 
     public void setupActions() {
+        // Create a new Menu
         pluginTool.setMenuGroup(new String[]{
                 MENUNAME
         }, GROUPNAME);
 
+        // create findAddressActions
         findAddressActions();
+        // create glitchAddressActions
         glitchAddressActions();
+        // create blankStateActions
         blankStateActions();
+        // create avoidAddressActions
         avoidAddressActions();
     }
 
     private void blankStateActions() {
+        // Create the action
         ListingContextAction setBlankStateAddress = new ListingContextAction("Set BlankState Address", getName()) {
             @Override
             protected void actionPerformed(ListingActionContext context) {
@@ -66,8 +75,10 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
                 "Set",
                 "BlankState Address"
         }));
+        // finally add the action
         pluginTool.addAction(setBlankStateAddress);
 
+        // Create the clear action
         ListingContextAction clearBlankStateAddress = new ListingContextAction("Clear BlankState Address", getName()) {
             @Override
             public void actionPerformed(ActionContext context) {
@@ -83,10 +94,12 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
                 "Clear",
                 "BlankState Address"
         }));
+        // finally add the action
         pluginTool.addAction(clearBlankStateAddress);
     }
 
     private void glitchAddressActions() {
+        // Create the action
         ListingContextAction setGlitchAddressAction = new ListingContextAction("Add Glitch Addresses", getName()) {
             @Override
             protected void actionPerformed(ListingActionContext context) {
@@ -106,8 +119,10 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
                 "Add",
                 "Glitch Addresses"
         }));
+        // finally add the action
         pluginTool.addAction(setGlitchAddressAction);
 
+        // Create the clear action
         ListingContextAction clearGlitchAddresses = new ListingContextAction("Clear Glitch Addresses", getName()) {
             @Override
             protected void actionPerformed(ListingActionContext context) {
@@ -123,10 +138,12 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
                 "Clear",
                 "Glitch Addresses"
         }));
+        // finally add the action
         pluginTool.addAction(clearGlitchAddresses);
     }
 
     private void findAddressActions() {
+        // Create the action
         ListingContextAction setFindAddressAction = new ListingContextAction("Set Find Address", getName()) {
 
             @Override
@@ -146,8 +163,10 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
                 "Set",
                 "Find Address"
         }, null, GROUPNAME));
+        // finally add the action
         pluginTool.addAction(setFindAddressAction);
 
+        // Create the clear action
         ListingContextAction clearFindAddressAction = new ListingContextAction("Clear Find Address", getName()) {
             @Override
             protected void actionPerformed(ListingActionContext context) {
@@ -161,10 +180,12 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
                 "Clear",
                 "Find Address"
         }));
+        // finally add the action
         pluginTool.addAction(clearFindAddressAction);
     }
 
     private void avoidAddressActions() {
+        // Create the action
         ListingContextAction addAvoidAddressAction = new ListingContextAction("Add Avoid Addresses", getName()) {
             @Override
             protected void actionPerformed(ListingActionContext context) {
@@ -184,8 +205,10 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
                 "Add",
                 "Avoid Addresses"
         }));
+        // finally add the action
         pluginTool.addAction(addAvoidAddressAction);
 
+        // Create the clear action
         ListingContextAction clearAvoidAddresses = new ListingContextAction("Clear Avoid Addresses", getName()) {
             @Override
             protected void actionPerformed(ListingActionContext context) {
@@ -201,6 +224,7 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
                 "Clear",
                 "Avoid Addresses"
         }));
+        // finally add the action
         pluginTool.addAction(clearAvoidAddresses);
     }
 
@@ -210,17 +234,25 @@ public class GhidraFaultInjectorListingContextAction extends ListingContextActio
     }
 
     public void unSetColor(Address address) {
+        // get a colorizing service instance
         ColorizingService service = pluginTool.getService(ColorizingService.class);
+        // coloring needs to be encapsulated by a transaction
         int TransactionID = program.startTransaction("UnSetColor");
+        // actually unset the color
         service.clearBackgroundColor(address, address);
+        // end the transaction
         program.endTransaction(TransactionID, true);
 
     }
 
     public void setColor(Address address, Color color) {
+        // get a colorizing service instance
         ColorizingService service = pluginTool.getService(ColorizingService.class);
+        // coloring needs to be encapsulated by a transaction
         int TransactionID = program.startTransaction("SetColor");
+        // actually color the address
         service.setBackgroundColor(address, address, color);
+        // end the transaction
         program.endTransaction(TransactionID, true);
 
     }

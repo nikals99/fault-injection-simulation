@@ -21,7 +21,9 @@ public class GhidraFaultInjectorPlugin extends ProgramPlugin {
     public GhidraFaultInjectorPlugin(PluginTool tool) {
         super(tool, true, true);
         String pluginName = getName();
+        // set up the main plugin window
         this.provider = new GhidraFaultInjectorProvider(this, pluginName, this.getCurrentProgram());
+        // set up the contextAction menu
         this.contextAction = new GhidraFaultInjectorListingContextAction(this, this.getCurrentProgram());
     }
 
@@ -32,6 +34,7 @@ public class GhidraFaultInjectorPlugin extends ProgramPlugin {
 
     @Override
     protected void programActivated(Program p) {
+        // if the loaded program / binary changes: update all references to it
         provider.setProgram(p);
         contextAction.setProgram(p);
     }

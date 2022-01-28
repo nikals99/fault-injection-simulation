@@ -23,18 +23,21 @@ public class GlitchOptionsPanel extends JPanel {
     }
 
     private Component buildGlitchOptionsPanel() {
+        // create a new panel
         JPanel panel = new JPanel();
-        panel.setForeground(new Color(46, 139, 87));
-        TitledBorder borderMPO = BorderFactory.createTitledBorder("Find options");
+        // add a border to the panel
+        TitledBorder borderMPO = BorderFactory.createTitledBorder("Glitch options");
         borderMPO.setTitleFont(new Font("SansSerif", Font.PLAIN, 12));
         panel.setBorder(borderMPO);
 
+        // use a ghidra layout that supports label -> input pairs
         panel.setLayout(new VariableHeightPairLayout());
 
+        // add a textArea + label for adding glitchAddresses
         glitchAddresses = new ScrollableTextArea(5, 25);
-        JScrollPane avoidAddrsScrollPane = new JScrollPane(glitchAddresses);
+        JScrollPane glitchAddrsScrollPane = new JScrollPane(glitchAddresses);
         panel.add(new GLabel("Glitch addresses:", SwingConstants.RIGHT));
-        panel.add(avoidAddrsScrollPane);
+        panel.add(glitchAddrsScrollPane);
 
         return panel;
     }
@@ -43,10 +46,11 @@ public class GlitchOptionsPanel extends JPanel {
         String[] instructionAddrs = glitchAddresses.getText().split("\n");
         ArrayList<Instruction> instructions = new ArrayList<>();
 
+        // Convert from string to instruction
         for (String instructionAddr : instructionAddrs) {
             instructions.add(new Instruction(instructionAddr));
         }
-
+        // convert to glitch options object
         GlitchOptions glitchOptions = new GlitchOptions(instructions);
         return glitchOptions;
     }
@@ -57,21 +61,25 @@ public class GlitchOptionsPanel extends JPanel {
 
 
     private void buildFindGlitchOuterSection() {
-        this.setForeground(new Color(46, 139, 87));
+        // create a border
         TitledBorder borderMPO = BorderFactory.createTitledBorder("Find Glitch");
         borderMPO.setTitleFont(new Font("SansSerif", Font.PLAIN, 12));
+        // add the border to the current panel
         this.setBorder(borderMPO);
+        // add a layout with north/south/east/west/center components
         this.setLayout(new BorderLayout());
 
+        // set the center component
         this.add(buildGlitchOptionsPanel(), BorderLayout.CENTER);
 
+        // add a run button as south component
         JPanel buttonPanel = new JPanel();
         JButton runButton = new JButton("RUN");
         runButton.addActionListener(actionListener -> {
+            // on click -> send the request to python
             this.provider.sendRequestToPython();
         });
         buttonPanel.add(runButton);
-
         this.add(buttonPanel, BorderLayout.SOUTH);
     }
 }

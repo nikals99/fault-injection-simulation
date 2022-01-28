@@ -34,44 +34,59 @@ public class MainOptionsPanel extends JPanel {
     }
 
     private void buildMainOptionsPanel() {
-        this.setForeground(new Color(46, 139, 87));
+        // create a border
         TitledBorder borderMPO = BorderFactory.createTitledBorder("Main project options");
         borderMPO.setTitleFont(new Font("SansSerif", Font.PLAIN, 12));
+        // add a border to the current panel
         this.setBorder(borderMPO);
+        // use a ghidra layout that supports label -> input pairs
         this.setLayout(new PairLayout());
 
-        //https://github.com/angr/angr-doc/blob/master/docs/loading.md
+        // set up the backend combobox and add it to the panel
+        // available options: https://github.com/angr/angr-doc/blob/master/docs/loading.md
         angrBackendComboBox = new GComboBox<>(new String[]{"blob", "elf", "pe", "mach-o"});
         this.add(new GLabel("Loader Backend:", SwingConstants.RIGHT));
         this.add(angrBackendComboBox);
 
+        // add archTextField + label to the current panel
         archTextField = new JTextField();
         this.add(new GLabel("Architecture:", SwingConstants.RIGHT));
         this.add(archTextField);
 
+        // add pathTextField + label to the current panel
         pathTextField = new JTextField();
+        // limit the width of the textfield
         pathTextField.setColumns(15);
         this.add(new GLabel("Path to binary:", SwingConstants.RIGHT));
         this.add(pathTextField);
 
+        // add baseAddrTextField + label to the current panel
         baseAddrTextField = new JTextField();
         this.add(new GLabel("Base Addr:", SwingConstants.RIGHT));
         this.add(baseAddrTextField);
 
+        // add entryPointTextField + label to the current panel
         entryPointTextField = new JTextField();
         this.add(new GLabel("Entrypoint:", SwingConstants.RIGHT));
         this.add(entryPointTextField);
 
+        // add blankStateStartAtTextField + label
         blankStateStartAtTextField = new JTextField();
-        blankStateStartAtTextField.setVisible(false);
         GLabel blankStateStartAtLabel = new GLabel("Blankstate Start At:", SwingConstants.RIGHT);
+        // hide blankStateStartAtTextField + label
+        blankStateStartAtTextField.setVisible(false);
         blankStateStartAtLabel.setVisible(false);
+
+        // add blankStateCheckBox
         blankStateCheckBox = new GCheckBox();
+        // add a listener to the checkbox.  It is triggered on select/deselect
         blankStateCheckBox.addItemListener(item -> {
+            // toggle the visibility for blankStateStartAtTextField + label
             blankStateStartAtTextField.setVisible(blankStateCheckBox.isSelected());
             blankStateStartAtLabel.setVisible(blankStateCheckBox.isSelected());
             this.revalidate();
         });
+        // add labels + components to the panel
         this.add(new GLabel("Use BlankState:", SwingConstants.RIGHT));
         this.add(blankStateCheckBox);
         this.add(blankStateStartAtLabel);
@@ -79,6 +94,7 @@ public class MainOptionsPanel extends JPanel {
     }
 
     public MainOptions getMainOptions() {
+        // get all options from inputFields
         MainOptions mainOptions = new MainOptions(
                 pathTextField.getText(),
                 (String) angrBackendComboBox.getSelectedItem(),
@@ -94,6 +110,7 @@ public class MainOptionsPanel extends JPanel {
     public void setProgram(Program program) {
         this.program = program;
         if (program != null) {
+            // prefill the backend field
             switch (program.getExecutableFormat()) {
                 case ElfLoader.ELF_NAME:
                     angrBackendComboBox.setSelectedIndex(1);
@@ -110,10 +127,13 @@ public class MainOptionsPanel extends JPanel {
                 default:
                     angrBackendComboBox.setSelectedIndex(0);
             }
-
+            // prefill the archTextField
             archTextField.setText(program.getLanguageID().getIdAsString());
+            // prefill the pathTextField
             pathTextField.setText(program.getExecutablePath());
+            // prefill the baseAddressTextField
             baseAddrTextField.setText("0x" + program.getImageBase().toString());
+            // prefill the entryPointTextField
             entryPointTextField.setText("0x" + program.getImageBase().toString());
         }
     }
